@@ -15,8 +15,14 @@ from typing import List, Union
 
 from .data_source import commands
 from .entities import Command
+#日常调度器
+from nonebot import require
+require("nonebot_plugin_apscheduler")
+from nonebot_plugin_apscheduler import scheduler
 
-import sqlite3
+# import sqlite3 数据库
+# conn = sqlite3.connect('bot_database.db')
+# conn.close()
 
 __plugin_meta__ = PluginMetadata(
     name="猫猫",
@@ -30,9 +36,6 @@ __plugin_meta__ = PluginMetadata(
     },
 )
 
-
-conn = sqlite3.connect('bot_database.db')
-conn.close()
 
 def handler_v11(command: Command) -> T_Handler:
     async def handle(
