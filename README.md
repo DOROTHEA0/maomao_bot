@@ -1,12 +1,4 @@
 # maomao_bot
-
-## How to start
-
-1. generate project using `nb create` .
-2. create your plugin using `nb plugin create` .
-3. writing your plugins under `maomao_bot/plugins` folder.
-4. run your bot using `nb run --reload` .
-
-## Documentation
-
-See [Docs](https://nonebot.dev/)
+## Arn家猫猫的重制版bot
+## 还没想好怎么介绍
+![本地GIF动画](/data/assets/111.gif)
