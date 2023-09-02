@@ -1,9 +1,11 @@
 from nonebot.adapters.onebot.v11 import MessageEvent
-from .depends import User, Arg, Args, NoArg, Items
+from typing import List
 from .data_source import arbeits, items
+from .depends import Self, MentionedUsers, MentionedUser
+from .entities import UserInfo
 
-def sign_in(s: dict=User()):
-    return str(s)
+def sign_in():
+    pass
 
 def list_shop():
     shop_item = [item for item in items.values() if item.on_sell]

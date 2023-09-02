@@ -57,7 +57,7 @@ class UserState:
 @dataclass
 class UserInfo:
     id: str = ""
-    group: str = ""
+    group_id: str = ""
     name: str = ""
     gender: Literal["male", "female", "unknown"] = "unknown"
     img_url: str = ""

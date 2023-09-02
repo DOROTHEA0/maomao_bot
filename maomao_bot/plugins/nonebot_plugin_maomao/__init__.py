@@ -15,7 +15,6 @@ from typing import List, Union
 
 from .commands import cmds
 from .entities import Command
-from .depends import msg_preprocess
 #日常调度器
 from nonebot import require
 require("nonebot_plugin_apscheduler")
@@ -56,6 +55,6 @@ def create_matchers():
         matcher = on_command(
             command.keywords[0], aliases=set(command.keywords), block=True, priority=12
         )
-        matcher.append_handler(handler_v11(command), parameterless=[msg_preprocess()])
+        matcher.append_handler(handler_v11(command))
 
 create_matchers()
