@@ -15,8 +15,6 @@ from nonebot.params import CommandArg, Depends
 from nonebot.typing import T_State
 from nonebot.log import logger
 from nonebot import require
-
-require("nonebot_plugin_imageutils")
 from nonebot_plugin_imageutils import BuildImage, Text2Image
 
 from .entities import UserInfo

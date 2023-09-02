@@ -10,6 +10,9 @@ from nonebot.params import Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_Handler
 
+from nonebot import require
+require("nonebot_plugin_imageutils")
+
 from io import BytesIO
 from typing import List, Union
 
