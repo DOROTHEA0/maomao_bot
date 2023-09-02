@@ -2,8 +2,8 @@ import shlex
 from io import BytesIO
 from typing import Tuple, Literal
 from nonebot import require
-require("nonebot_plugin_imageutils")
-from nonebot_plugin_imageutils import BuildImage, Text2Image
+# require("nonebot_plugin_imageutils")
+# from nonebot_plugin_imageutils import BuildImage, Text2Image
 
 from nonebot.adapters.onebot.v11 import (
     Bot,
@@ -19,18 +19,18 @@ from nonebot.log import logger
 
 from .entities import UserInfo
 from .utils import get_user_info
+from .data_source import arbeits, items
 
 
 def msg_preprocess():
-    def dependency(event: MessageEvent, state: T_State):
-
-        return
-
+    def dependency(event: MessageEvent, state: T_State, arg: Message = CommandArg()):
+        state['msg'] = str(event.get_message())
+        state['arg'] = arg.extract_plain_text().strip()
     return Depends(dependency)
 
 def User():
     def dependency(bot: Bot, state: T_State):
-        return state["SENDER"]
+        return state
     return Depends(dependency)
 
 def MentionedUsers():
@@ -39,6 +39,15 @@ def MentionedUsers():
 def MentionedUser():
     pass
 
+def Items():
+    def dependency():
+        return items
+    return Depends(dependency)
+
+def Arbeits():
+    def dependency():
+        return arbeits
+    return Depends(dependency)
 
 def Arg():
     def dependency(msg: Message = CommandArg()):
@@ -60,6 +69,6 @@ def Args():
 
 
 def NoArg():
-    def dependency(arg: Literal[""] = Arg()):
+    def dependency():
         return
     return Depends(dependency)

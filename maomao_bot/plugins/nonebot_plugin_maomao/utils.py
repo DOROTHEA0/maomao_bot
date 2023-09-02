@@ -28,5 +28,11 @@ def generate_random_probability():
     return probability
 
 
-def random_choose(lst: List, prob: List):
-    pass
+def weighted_random_choice(items, probabilities):
+    shuffled_items = list(zip(items, probabilities))
+    random.shuffle(shuffled_items)
+    rand = random.random()
+    for item, probability in shuffled_items:
+        rand -= probability
+        if rand <= 0:
+            return item
