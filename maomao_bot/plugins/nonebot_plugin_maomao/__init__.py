@@ -9,20 +9,20 @@ from nonebot.matcher import Matcher
 from nonebot.params import Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_Handler
+from nonebot.permission import SUPERUSER
+from nonebot import logger
 
 from nonebot import require
 require("nonebot_plugin_imageutils")
 
 from io import BytesIO
 from typing import List, Union
-
 from .commands import cmds
-from .entities import Command
+from .entities import Command, UserState, UserInfo
 #日常调度器
 from nonebot import require
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler
-
 import sqlite3
 
 
@@ -51,6 +51,26 @@ cursor.execute('''
 conn.commit()
 conn.close()
 
+def update_signed_status():
+    logger.info("每日签到更新开始>>>>>")
+    conn = sqlite3.connect('my_database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, user_data FROM USER_STATE")
+    rows = cursor.fetchall()
+    user_states = []
+    ids = []
+    for row in rows:
+        id, user_state = row[0], UserState(**row[1])
+        user_state.signed = False
+        user_states.append(user_state)
+        ids.append(id)
+    conn.close()
+    [UserInfo(id=ids[i]).save_states(user_states[i]) for i in range(len(ids))]
+    logger.info("每日签到更新完成>>>>>")
+
+
+scheduler.add_job(update_signed_status, "interval", days=1, id="update_signed_status")
+
 def handler_v11(command: Command) -> T_Handler:
     async def handle(
         #bot: Bot,
@@ -66,9 +86,14 @@ def handler_v11(command: Command) -> T_Handler:
 
 def create_matchers():
     for command in cmds:
-        matcher = on_command(
-            command.keywords[0], aliases=set(command.keywords), block=True, priority=12
-        )
+        if command.superuser_permission:
+            matcher = on_command(
+                command.keywords[0], aliases=set(command.keywords), block=True, priority=12, permission=SUPERUSER
+            )
+        else:
+            matcher = on_command(
+                command.keywords[0], aliases=set(command.keywords), block=True, priority=12
+            )
         matcher.append_handler(handler_v11(command))
 
 create_matchers()

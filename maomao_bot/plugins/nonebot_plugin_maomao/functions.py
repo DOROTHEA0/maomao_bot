@@ -11,8 +11,18 @@ from .utils import weighted_random_choice
 
 arbeit_time = 300
 
-def sign_in():
-    pass
+def sign_in(sender: UserInfo=Self()):
+    user_state: UserState = sender.load_states()
+    if user_state.signed:
+        return "你好像来了不止一次？失忆了吗？（歪头）"
+    user_state.signed = True
+    rand_button = weighted_random_choice([7, 8, 9, 10], [0.25, 0.25, 0.25, 0.25])
+    rand_affection = weighted_random_choice([1, 2], [0.5, 0.5])
+    user_state.buttons += rand_button
+    user_state.affection += rand_affection
+    sender.save_states(user_state)
+    return f"记下啦！今天也是美好的一天☆（增加{rand_affection}点好感，增加{rand_button}枚小纽扣)"
+
 
 def list_shop():
     shop_item = [item for item in items.values() if item.on_sell]

@@ -9,5 +9,5 @@ cmds = [
     # Command(("送礼",), None),
     Command(("打工",), start_arbeit),
     Command(("结束打工", "下班",), finish_arbeit),
-    Command(("增加纽扣", "增加小纽扣", "添加纽扣", "添加小纽扣"), add_buttons)
+    Command(("增加纽扣", "增加小纽扣", "添加纽扣", "添加小纽扣"), add_buttons, superuser_permission=True)
 ]

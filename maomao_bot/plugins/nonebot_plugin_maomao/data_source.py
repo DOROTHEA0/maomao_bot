@@ -6,7 +6,7 @@ arbeits = {
                      insufficient_des="还没到下班时间呢，再耐心等等吧！",  # 早退描述
                      normal_ending_des="yeah——下班啦！回家回家！【获得10个小纽扣】",  # 正常下班事件描述
                      abnormal_ending_des="你工作时因疏忽大意不小心将咖啡打翻，泼到了客人身上，因此本次打工的工资全部用来赔款了……（对手指）", # 不正常下班事件描述
-                     occurrence_prob=0.5, normal_prob=0.6, normal_reward=range(10, 15), abnormal_reward=0),  # 出现概率，正常下班事件概率，正常事件奖励(范围)，不正常事件奖励
+                     occurrence_prob=0.5, normal_prob=0.6, normal_reward=10, abnormal_reward=0),  # 出现概率，正常下班事件概率，正常事件奖励(范围)，不正常事件奖励
     "教会": Arbeit(name="教会", institution="教会",
                    description="你来到了一间教堂，或许这儿只有一些志愿者工作，并不能挣到什么，但或许可以通过祷告提升一下别的什么……",
                    insufficient_des="嘘——似乎还没有结束，再等等吧……♭",
@@ -16,7 +16,7 @@ arbeits = {
     "收容所": Arbeit(name="收容所", institution="收容所",
                      description="你来到了一处非人收容所，在此处兼职或许可以大赚一笔，但存在一定量的生命危险，这对你来说真的有必要性吗？",
                      insufficient_des="我理解你想下班的心情，但是时间还没到5555……",
-                     normal_ending_des="！终于结束了！！快跑啊啊啊啊！！！",
+                     normal_ending_des="！终于结束了！！快跑啊啊啊啊！！！【获得50个小纽扣】",
                      abnormal_ending_des="因为你的管理疏忽，导致了收容的非人存在出逃，造成了巨大的损失，你在逃跑过程中丢失了20枚小纽扣……",
                      occurrence_prob=0.1, normal_prob=0.2, normal_reward=50, abnormal_reward=-20),
     "A某人的家": Arbeit(name="A某人的家", institution="？？？",

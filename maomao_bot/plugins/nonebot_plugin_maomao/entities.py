@@ -9,6 +9,7 @@ from nonebot_plugin_imageutils import BuildImage
 class Command:
     keywords: Tuple[str, ...]
     func: Callable
+    superuser_permission: bool = False
 
 @dataclass
 class Message:
@@ -56,6 +57,7 @@ class UserState:
     arbeit_start_time: int = -1
     arbeit_name: str = ""
     signed: bool = False
+    last_reply: str = ""
 
 
 @dataclass
