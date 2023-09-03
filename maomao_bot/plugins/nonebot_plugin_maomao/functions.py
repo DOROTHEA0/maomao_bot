@@ -8,7 +8,7 @@ from .entities import UserState, UserInfo, Arbeit
 from .utils import weighted_random_choice
 
 
-arbeit_time = 300
+arbeit_time = 3600
 
 def sign_in(sender: UserInfo=Self()):
     user_state: UserState = sender.load_states()
