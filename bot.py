@@ -1,5 +1,5 @@
 import nonebot
-from nonebot.adapters.console import Adapter as ConsoleAdapter  # 避免重复命名
+# from nonebot.adapters.console import Adapter as ConsoleAdapter  # 避免重复命名
 from nonebot.adapters.onebot import V11Adapter as OneBotAdapter
 
 # 初始化 NoneBot

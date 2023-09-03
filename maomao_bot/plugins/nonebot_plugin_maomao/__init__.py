@@ -23,9 +23,9 @@ from nonebot import require
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler
 
-# import sqlite3 数据库
-# conn = sqlite3.connect('bot_database.db')
-# conn.close()
+import sqlite3
+
+
 
 __plugin_meta__ = PluginMetadata(
     name="猫猫",
@@ -39,6 +39,17 @@ __plugin_meta__ = PluginMetadata(
     },
 )
 
+
+conn = sqlite3.connect('data/user_states.db')
+cursor = conn.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS USER_STATE (
+        id INTEGER PRIMARY KEY,
+        user_data TEXT
+    )
+''')
+conn.commit()
+conn.close()
 
 def handler_v11(command: Command) -> T_Handler:
     async def handle(

@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Tuple, Callable, Union, Literal, List
 from nonebot_plugin_imageutils import BuildImage
 
@@ -18,6 +18,7 @@ class Message:
 
 @dataclass
 class Arbeit:
+    name: str
     institution: str
     description: str
     insufficient_des: str
@@ -49,9 +50,12 @@ class Item:
 
 @dataclass
 class UserState:
-    buttons: int
-    affection: int
-    bag: dict[str, int]
+    buttons: int = 0
+    affection: int = 0
+    bag: dict[str, int] = field(default_factory=dict)
+    arbeit_start_time: int = -1
+    arbeit_name: str = ""
+    signed: bool = False
 
 
 @dataclass
@@ -82,8 +86,12 @@ class UserInfo:
     def load_states(self) -> UserState:
         conn = sqlite3.connect(self.db_name)
         cursor = conn.cursor()
-
-
-    def add_item(self, item_name, item_count):
-        pass
+        cursor.execute("SELECT user_data FROM USER_STATE WHERE id=?", (int(self.id),))
+        row = cursor.fetchone()
+        if row:
+            json_data = row[0]
+            loaded_data = json.loads(json_data)
+            return UserState(**loaded_data)
+        else:
+            return UserState()
 

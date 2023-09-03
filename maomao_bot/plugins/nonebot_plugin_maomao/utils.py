@@ -29,6 +29,8 @@ def generate_random_probability():
 
 
 def weighted_random_choice(items, probabilities):
+    seed = int(time.time())
+    random.seed(seed)
     shuffled_items = list(zip(items, probabilities))
     random.shuffle(shuffled_items)
     rand = random.random()
