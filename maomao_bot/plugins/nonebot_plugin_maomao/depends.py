@@ -2,7 +2,6 @@ import shlex
 from io import BytesIO
 from typing import Tuple, Literal, List
 
-
 from nonebot.adapters.onebot.v11 import (
     Bot,
     GroupMessageEvent,
@@ -31,29 +30,38 @@ def Self(get_fully_info=False):
         if get_fully_info:
             await get_user_info(bot, user)
         return user
+
     return Depends(dependency)
 
+
 def MentionedUsers(get_fully_info=False):
-    async def dependency(bot: Bot, event: GroupMessageEvent, state: T_State):
+    async def dependency(bot: Bot, event: MessageEvent, state: T_State):
         m_users_id = [seg.data["qq"] for seg in state["_prefix"]["command_arg"] if seg.type == 'at']
-        users = [UserInfo(id=i, group_id=str(event.group_id)) for i in m_users_id]
+        try:
+            users = [UserInfo(id=i, group_id=str(event.group_id)) for i in m_users_id]
+        except AttributeError:
+            return []
         if get_fully_info:
             for user in users:
                 await get_user_info(bot, user)
         return users
+
     return Depends(dependency)
 
+
 def MentionedUser(get_fully_info=False):
-    async def dependency(mentioned_users: List[UserInfo]=MentionedUsers(get_fully_info)):
+    async def dependency(mentioned_users: List[UserInfo] = MentionedUsers(get_fully_info)):
         if len(mentioned_users) == 0:
             return None
         return mentioned_users[0]
+
     return Depends(dependency)
 
 
 def Arg():
     def dependency(msg: Message = CommandArg()):
         return unescape(msg.extract_plain_text().strip())
+
     return Depends(dependency)
 
 
@@ -73,4 +81,5 @@ def Args():
 def NoArg():
     def dependency():
         return
+
     return Depends(dependency)

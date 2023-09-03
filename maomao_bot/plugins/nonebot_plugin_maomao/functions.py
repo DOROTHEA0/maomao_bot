@@ -1,5 +1,4 @@
 import time
-from nonebot.adapters.onebot.v11 import MessageEvent
 from typing import List
 from nonebot_plugin_imageutils import BuildImage, Text2Image
 
@@ -93,12 +92,18 @@ def finish_arbeit(sender: UserInfo=Self()):
 
 
 # 管理权限
-def add_buttons(sender: UserInfo=Self(), arg: str=Arg()):
+def add_buttons(sender: UserInfo=Self(), arg: str=Arg(), m_user: UserInfo=MentionedUser()):
     try:
         button_count = int(arg)
     except ValueError as e:
         return "要输入添加数字呢"
-    user_state: UserState = sender.load_states()
-    user_state.buttons += button_count
-    sender.save_states(user_state)
-    return "添加成功！"
+    if m_user is not None:
+        user_state: UserState = m_user.load_states()
+        user_state.buttons += button_count
+        m_user.save_states(user_state)
+        return f"添加指定用户{m_user.id}成功！"
+    else:
+        user_state: UserState = sender.load_states()
+        user_state.buttons += button_count
+        sender.save_states(user_state)
+        return "添加成功！"
