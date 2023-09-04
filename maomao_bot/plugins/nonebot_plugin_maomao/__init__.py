@@ -1,5 +1,8 @@
+import re
+
 from nonebot.plugin import PluginMetadata
-from nonebot import on_command
+from nonebot import on_command, on_regex, on_message
+from nonebot.rule import to_me
 from nonebot.adapters.onebot.v11 import Bot
 from nonebot.adapters.onebot.v11 import GroupMessageEvent
 from nonebot.adapters.onebot.v11 import Message
@@ -9,7 +12,6 @@ from nonebot.matcher import Matcher
 from nonebot.params import Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_Handler
-from nonebot.permission import SUPERUSER
 from nonebot import logger
 
 from nonebot import require
@@ -17,8 +19,10 @@ require("nonebot_plugin_imageutils")
 
 from io import BytesIO
 from typing import List, Union
-from .commands import cmds
-from .entities import Command, UserState, UserInfo
+from .commands import cmds, dialogs, to_me_dig
+from .entities import Command, Dialog, UserState, UserInfo
+from .depends import IsArn, Self
+from .utils import weighted_random_choice
 #日常调度器
 from nonebot import require
 require("nonebot_plugin_apscheduler")
@@ -84,16 +88,33 @@ def handler_v11(command: Command) -> T_Handler:
             await matcher.finish(MessageSegment.image(res))
     return handle
 
+def reply_handler(dialog: Dialog) -> T_Handler:
+    async def handle(
+        matcher: Matcher,
+        is_arn: bool = IsArn(),
+        sender: UserInfo = Self()
+    ):
+        if dialog.reply_to_arn and is_arn:
+            await matcher.finish(weighted_random_choice(dialog.reply_to_arn_content, [1 / len(dialog.reply_to_arn_content) for _ in dialog.reply_to_arn_content]))
+        user_state = sender.load_states()
+        for i, upper_bound in enumerate(dialog.feeling_threshold):
+            if user_state.affection < upper_bound:
+                await matcher.finish(weighted_random_choice(dialog.reply[i], [1 / len(dialog.reply[i]) for _ in dialog.reply[i]]))
+        await matcher.finish(weighted_random_choice(dialog.reply[-1], [1 / len(dialog.reply[-1]) for _ in dialog.reply[-1]]))
+    return handle
+
+
 def create_matchers():
     for command in cmds:
-        if command.superuser_permission:
-            matcher = on_command(
-                command.keywords[0], aliases=set(command.keywords), block=True, priority=12, permission=SUPERUSER
-            )
-        else:
-            matcher = on_command(
-                command.keywords[0], aliases=set(command.keywords), block=True, priority=12
-            )
+        matcher = on_command(
+            command.keywords[0], aliases=set(command.keywords), block=True, priority=10, permission=command.permission
+        )
         matcher.append_handler(handler_v11(command))
 
+    for dialog in dialogs:
+        matcher = on_regex(pattern=dialog.pattern, flags=re.M, permission=dialog.permission, priority=12, block=True)
+        matcher.append_handler(reply_handler(dialog))
 create_matchers()
+
+call_me_matcher = on_message(rule=to_me(), priority=12, block=True)
+call_me_matcher.append_handler(reply_handler(to_me_dig))

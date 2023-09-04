@@ -1,5 +1,7 @@
 from .entities import Arbeit, Item
 
+arbeit_time = 3600
+
 arbeits = {
     "咖啡馆": Arbeit(name="咖啡馆", institution="咖啡馆",  # 地点
                      description="这里是一家平平无奇的古典咖啡店，店长K是一位温和的先生，偶尔在这儿兼职挣点外快或许再合适不过……", # 工作描述

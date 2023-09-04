@@ -1,21 +1,26 @@
 import json
 import sqlite3
 from dataclasses import dataclass, asdict, field
-from typing import Tuple, Callable, Union, Literal, List
+from typing import Tuple, Callable, Union, Literal, List, Optional
 from nonebot_plugin_imageutils import BuildImage
+from nonebot.permission import Permission
+from nonebot.typing import T_PermissionChecker
 
 
 @dataclass
 class Command:
     keywords: Tuple[str, ...]
     func: Callable
-    superuser_permission: bool = False
+    permission: Optional[Union[Permission, T_PermissionChecker]] = None
 
 @dataclass
-class Message:
-    keyword: Tuple[str, ...]
-    pattern: str
-    func: Callable
+class Dialog:
+    pattern: str = ""
+    feeling_threshold: List[int] = field(default_factory=list)
+    reply: List[List[str]] = field(default_factory=list)
+    permission: Optional[Union[Permission, T_PermissionChecker]] = None
+    reply_to_arn: bool = False
+    reply_to_arn_content: List[str] = field(default_factory=list)
 
 @dataclass
 class Arbeit:

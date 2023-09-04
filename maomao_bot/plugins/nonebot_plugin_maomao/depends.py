@@ -18,6 +18,7 @@ from nonebot_plugin_imageutils import BuildImage, Text2Image
 
 from .entities import UserInfo
 from .utils import get_user_info
+from .permission import ARN
 
 
 def Self(get_fully_info=False):
@@ -83,3 +84,7 @@ def NoArg():
         return
 
     return Depends(dependency)
+
+
+def IsArn():
+    return Depends(ARN)

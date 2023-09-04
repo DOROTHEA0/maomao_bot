@@ -2,13 +2,13 @@ import time
 from typing import List
 from nonebot_plugin_imageutils import BuildImage, Text2Image
 
-from .data_source import arbeits, items
+from .data_source import arbeits, items, arbeit_time
 from .depends import Self, MentionedUsers, MentionedUser, Args, Arg, NoArg
 from .entities import UserState, UserInfo, Arbeit
 from .utils import weighted_random_choice
 
 
-arbeit_time = 3600
+
 
 def sign_in(sender: UserInfo=Self()):
     user_state: UserState = sender.load_states()

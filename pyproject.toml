@@ -10,6 +10,6 @@ adapters = [
     { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
     #{ name = "Console", module_name = "nonebot.adapters.console" }
 ]
-plugins = ["nonebot_plugin_imageutils", "nonebot_plugin_apscheduler"]
+plugins = ["nonebot_plugin_imageutils", "nonebot_plugin_apscheduler", "nonebot_plugin_tarot"]
 plugin_dirs = ["maomao_bot/plugins"]
 builtin_plugins = ["echo"]

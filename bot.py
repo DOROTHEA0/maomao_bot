@@ -10,6 +10,7 @@ driver = nonebot.get_driver()
 driver.register_adapter(OneBotAdapter)
 
 nonebot.load_builtin_plugins("echo")
+nonebot.load_plugin("nonebot_plugin_tarot")
 nonebot.load_plugins("maomao_bot/plugins")
 
 if __name__ == "__main__":
