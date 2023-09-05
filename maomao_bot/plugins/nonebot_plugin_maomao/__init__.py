@@ -22,7 +22,7 @@ from typing import List, Union
 from .commands import cmds, dialogs, to_me_dig
 from .entities import Command, Dialog, UserState, UserInfo
 from .depends import IsArn, Self
-from .utils import weighted_random_choice
+from .utils import weighted_random_choice, ranged_choose
 #日常调度器
 from nonebot import require
 require("nonebot_plugin_apscheduler")
@@ -97,10 +97,8 @@ def reply_handler(dialog: Dialog) -> T_Handler:
         if dialog.reply_to_arn and is_arn:
             await matcher.finish(weighted_random_choice(dialog.reply_to_arn_content, [1 / len(dialog.reply_to_arn_content) for _ in dialog.reply_to_arn_content]))
         user_state = sender.load_states()
-        for i, upper_bound in enumerate(dialog.feeling_threshold):
-            if user_state.affection < upper_bound:
-                await matcher.finish(weighted_random_choice(dialog.reply[i], [1 / len(dialog.reply[i]) for _ in dialog.reply[i]]))
-        await matcher.finish(weighted_random_choice(dialog.reply[-1], [1 / len(dialog.reply[-1]) for _ in dialog.reply[-1]]))
+        reply_list = ranged_choose(dialog.feeling_threshold, user_state.affection, dialog.reply)
+        await matcher.finish(weighted_random_choice(reply_list, [1 / len(dialog.reply[-1]) for _ in reply_list]))
     return handle
 
 
@@ -112,7 +110,7 @@ def create_matchers():
         matcher.append_handler(handler_v11(command))
 
     for dialog in dialogs:
-        matcher = on_regex(pattern=dialog.pattern, flags=re.M, permission=dialog.permission, priority=12, block=True)
+        matcher = on_regex(pattern=dialog.pattern, flags=(re.M | re.I), permission=dialog.permission, priority=12, block=True)
         matcher.append_handler(reply_handler(dialog))
 create_matchers()
 

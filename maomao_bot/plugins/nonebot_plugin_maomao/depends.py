@@ -20,6 +20,10 @@ from .entities import UserInfo
 from .utils import get_user_info
 from .permission import ARN
 
+def Cmd():
+    def dependency(state: T_State):
+        return state['_prefix']['raw_command']
+    return Depends(dependency)
 
 def Self(get_fully_info=False):
     async def dependency(bot: Bot, event: MessageEvent):

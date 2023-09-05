@@ -28,13 +28,23 @@ def generate_random_probability():
     return probability
 
 
-def weighted_random_choice(items, probabilities):
-    seed = int(time.time())
-    random.seed(seed)
-    shuffled_items = list(zip(items, probabilities))
-    random.shuffle(shuffled_items)
-    rand = random.random()
-    for item, probability in shuffled_items:
-        rand -= probability
-        if rand <= 0:
-            return item
+def weighted_random_choice(items, probabilities, times=1):
+    items_pair = list(zip(items, probabilities))
+    res = []
+    for _ in range(times):
+        rand = random.random()
+        for item, probability in items_pair:
+            rand -= probability
+            if rand <= 0:
+                res.append(item)
+                break
+    return res[0] if times == 1 else res
+
+def ranged_choose(bounds, num, input_list):
+    assert len(bounds) == len(input_list) - 1
+    selected_item = input_list[-1]
+    for i, upper_bound in enumerate(bounds):
+        if num < upper_bound:
+            selected_item = input_list[i]
+            break
+    return selected_item

@@ -1,11 +1,11 @@
 import time
-from typing import List
+from typing import List, Union
 from nonebot_plugin_imageutils import BuildImage, Text2Image
 
-from .data_source import arbeits, items, arbeit_time
-from .depends import Self, MentionedUsers, MentionedUser, Args, Arg, NoArg
-from .entities import UserState, UserInfo, Arbeit
-from .utils import weighted_random_choice
+from .data_source import arbeits, items, arbeit_time, basic_item_list
+from .depends import Self, MentionedUsers, MentionedUser, Args, Arg, NoArg, Cmd
+from .entities import UserState, UserInfo, Arbeit, Item, BasicItem
+from .utils import weighted_random_choice, ranged_choose
 
 
 
@@ -58,10 +58,24 @@ def buy_item(sender: UserInfo=Self(), arg: str=Arg()):
     sender.save_states(user_state)
     return "感谢购买——欢迎下次再来☆"
 
+def give_present(sender: UserInfo=Self(), arg: str=Arg()):
+    user_state: UserState = sender.load_states()
+    if not arg or arg not in user_state.bag:
+        return ""
+    item = items[arg]
+    user_state.bag[arg] -= 1
+    if user_state.bag[arg] <= 0:
+        del user_state.bag[arg]
+    user_state.affection += item.affection
+    reply_list = ranged_choose(item.gift_reply_threshold, user_state.affection, item.gift_reply)
+    sender.save_states(user_state)
+    return weighted_random_choice(reply_list, [1 / len(reply_list) for _ in reply_list])
+
+
 def start_arbeit(sender: UserInfo=Self()):
     user_state: UserState = sender.load_states()
     if user_state.arbeit_name:
-        return "下班的话记得【#结束打工】喵~"
+        return "下班的话记得【结束打工】喵~"
     arbs = list(arbeits.values())
     probs = [arb.occurrence_prob for arb in arbs]
     random_arbeit: Arbeit = weighted_random_choice(arbs, probs)
@@ -90,20 +104,55 @@ def finish_arbeit(sender: UserInfo=Self()):
     sender.save_states(user_state)
     return send_msg
 
+def gacha(sender: UserInfo=Self(), command: str=Cmd()):
+    def process_single_item(state: UserState, item: Union[Item, BasicItem]):
+        if isinstance(item, Item):
+            if item.name not in state.bag:
+                state.bag[item.name] = 1
+            else:
+                state.bag[item.name] += 1
+            return item.name + "x1\n" + item.gacha_des + "\n"
+        else:
+            if item.type == "btn":
+                state.buttons += item.button_reward
+            elif item.type == "mute":
+                pass #禁言处理
+            return item.get_gacha_des() + "\n"
+
+    # 组卡池
+    gacha_list = list(basic_item_list.keys()) + [name for name, item in items.items() if item.in_gacha]
+    gacha_probs = [item.prob for item in basic_item_list.values()] + [item.prob_pair for item in items.values() if item.in_gacha]
+    user_state = sender.load_states()
+    if command in ["抽卡", "单抽"]:
+        if user_state.buttons - 5 < 0:
+            return "要花费五枚小纽扣才可以进行抽奖哦～【小纽扣不足】"
+        user_state.buttons -= 5
+        gacha_res = weighted_random_choice(gacha_list, gacha_probs)
+        gacha_res = items[gacha_res] if gacha_res in items else basic_item_list[gacha_res]
+        send_msg = process_single_item(user_state, gacha_res)
+        sender.save_states(user_state)
+        return send_msg
+    else:
+        if user_state.buttons - 50 < 0:
+            return "要花费五十枚小纽扣才可以进行十连抽哦～【小纽扣不足】"
+        user_state.buttons -= 50
+        gacha_res = weighted_random_choice(gacha_list, gacha_probs, times=10)
+    send_msg = "十连吗？我看看……\n"
+    for i, item_name in enumerate(gacha_res):
+        send_msg += str(i + 1) + "：\n"
+        item = items[item_name] if item_name in items else basic_item_list[item_name]
+        send_msg += process_single_item(user_state, item)
+    sender.save_states(user_state)
+    return send_msg
+
 
 # 管理权限
-def add_buttons(sender: UserInfo=Self(), arg: str=Arg(), m_user: UserInfo=MentionedUser()):
+def add_buttons(arg: str=Arg(), m_user: UserInfo=MentionedUser()):
     try:
         button_count = int(arg)
     except ValueError as e:
         return "要输入添加数字呢"
-    if m_user is not None:
-        user_state: UserState = m_user.load_states()
-        user_state.buttons += button_count
-        m_user.save_states(user_state)
-        return f"添加指定用户{m_user.id}成功！"
-    else:
-        user_state: UserState = sender.load_states()
-        user_state.buttons += button_count
-        sender.save_states(user_state)
-        return "添加成功！"
+    user_state: UserState = m_user.load_states()
+    user_state.buttons += button_count
+    m_user.save_states(user_state)
+    return f"添加指定用户{m_user.id}成功！"

@@ -41,17 +41,39 @@ class Arbeit:
 
 @dataclass
 class Item:
-    name: str
-    affection: int
-    description: str
-    price: int
+    name: str = ""
+    affection: int = 0
+    description: str = ""
+    price: int = 0
     on_sell: bool = True
     in_gacha: bool = False
     gacha_des: str = ""
+    gift_reply_threshold: List[int] = field(default_factory=list)
+    gift_reply: List[List[str]] = field(default_factory=list)
     prob_pair: Union[float, List[Tuple[float, int]]] = 0
 
     def get_shop_des(self) -> str:
         return f"{self.name} 【好感度+{self.affection}】\n售价：{self.price}枚小纽扣\n说明：{self.description}\n"
+
+@dataclass
+class BasicItem:
+    name: str = ""
+    type: str = "" # btn, mute, null
+    button_reward: int = 0
+    mute_time: Union[range, int] = 0
+    prob: float = 0.
+
+    def get_gacha_des(self):
+        if self.type == "btn":
+            if self.button_reward > 5:
+                return f"抽中了【小纽扣×{self.button_reward}】也算是小赚一笔了"
+            else:
+                return f"抽中了【小纽扣×{self.button_reward}】亏了……但不多？(￣～￣)嚼！"
+        elif self.type == "mute":
+            return f"恭喜——！奖励你冷静一小会儿xxxx，禁言{self.mute_time}分钟。"
+        elif self.type == "null":
+            return "好可惜呢，什么都没抽中……（目移）"
+
 
 
 @dataclass
